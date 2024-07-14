@@ -1,4 +1,5 @@
 import User from './user.js';
-import ContactUs from './contactUs.js';
+import { ContactUs, NewsLetter } from './contactUs.js';
+import Booking from './booking.js';
 
-export { User, ContactUs };
+export { User, ContactUs, NewsLetter, Booking };

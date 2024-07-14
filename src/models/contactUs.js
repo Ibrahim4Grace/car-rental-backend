@@ -45,6 +45,21 @@ const contactUsSchema = new mongoose.Schema(
   }
 );
 
+const newsLetterSchema = new mongoose.Schema(
+  {
+    subscriberEmail: {
+      type: String,
+      required: [true, 'Email is required'],
+      lowercase: true,
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const NewsLetter = mongoose.model('NewsLetter', newsLetterSchema);
 const ContactUs = mongoose.model('ContactUs', contactUsSchema);
 
-export default ContactUs;
+export { ContactUs, NewsLetter };

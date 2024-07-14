@@ -1,4 +1,5 @@
-import contactUsSchema from './contactusVal.js';
+import { contactUsSchema, newsLetterSchema } from './contactusVal.js';
 import userSchema from './userVal.js';
+import bookingSchema from './bookingVal.js';
 
-export { contactUsSchema, userSchema };
+export { contactUsSchema, newsLetterSchema, userSchema, bookingSchema };

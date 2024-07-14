@@ -24,4 +24,11 @@ const contactUsSchema = Joi.object({
   }),
 });
 
-export default contactUsSchema;
+const newsLetterSchema = Joi.object({
+  subscriberEmail: Joi.string().email().required().messages({
+    'string.empty': 'Email is required',
+    'string.email': 'Email must be valid',
+  }),
+});
+
+export { contactUsSchema, newsLetterSchema };

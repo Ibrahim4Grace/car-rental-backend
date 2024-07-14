@@ -5,6 +5,7 @@ import db from './src/config/db.js';
 import { notFound, errorHandler } from './src/middlewares/errorMiddleware.js';
 import routes from './src/routes/index.js';
 import cors from 'cors';
+import corsOptions from './src/config/corsOptions.js';
 import colors from 'colors';
 
 dotenv.config();
@@ -13,13 +14,6 @@ db.connectDb();
 
 const app = express();
 
-var corsOptions = {
-  origin: ['*'],
-  methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
-  httpOnly: true,
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
 app.use(cors(corsOptions));
 
 app.use(express.json());

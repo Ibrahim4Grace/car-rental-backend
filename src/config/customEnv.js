@@ -50,6 +50,8 @@ const customEnv = {
   officeCity: process.env.OFFICE_CITY,
   officeState: process.env.OFFICE_STATE,
   officeCountry: process.env.OFFICE_COUNTRY,
+
+  cors: process.env.CORS_WHITELIST,
 };
 
 export default customEnv;
