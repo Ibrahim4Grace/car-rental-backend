@@ -1,13 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import db from './api/config/db.js';
-import { notFound, errorHandler } from './api/middleware/errorMiddleware.js';
+import db from './src/config/db.js';
+import { notFound, errorHandler } from './src/middlewares/errorMiddleware.js';
+import routes from './src/routes/index.js';
 import cors from 'cors';
 import colors from 'colors';
-
-import authUserRoutes from './api/routes/authUserRoutes.js';
-import organisationRoutes from './api/routes/organisationRoutes.js';
 
 dotenv.config();
 
@@ -33,8 +31,8 @@ app.get('/', (req, res) => {
   res.send('Kadosh API is running');
 });
 
-app.use('/api/auth', authUserRoutes);
-app.use('/api/org', organisationRoutes);
+// Use routes
+app.use(routes);
 
 app.use(notFound);
 app.use(errorHandler);

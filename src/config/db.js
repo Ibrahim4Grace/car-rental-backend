@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import customEnv from '../customEnv.js';
-import logger from '../logger/logger.js';
+import customEnv from '../config/customEnv.js';
+import logger from '../../logger/logger.js';
 
 const connection = {};
 

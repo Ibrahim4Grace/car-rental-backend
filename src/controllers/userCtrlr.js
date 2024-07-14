@@ -1,7 +1,7 @@
-import { APIError } from './middleware/errorMiddleware.js';
+import { APIError } from '../middlewares/errorMiddleware.js';
 import * as userService from '../services/userService.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
-import logger from '../logger/logger.js';
+import logger from '../../logger/logger.js';
 
 // Create a new user
 export const createUser = asyncHandler(async (req, res) => {

@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const userSchema = Joi.object({
+const contactUsSchema = Joi.object({
   firstName: Joi.string().required().messages({
     'string.empty': 'First name is required',
   }),
@@ -14,13 +14,14 @@ const userSchema = Joi.object({
     'string.empty': 'Email is required',
     'string.email': 'Email must be valid',
   }),
-  phone: Joi.string().required().messages({
-    'string.empty': 'Phone number is required',
+  subject: Joi.string().required().messages({
+    'string.empty': 'Subject is required',
   }),
-  message: Joi.string().min(6).required().messages({
+  message: Joi.string().min(6).max(250).required().messages({
     'string.empty': 'Message is required',
     'string.min': 'Message must be at least 6 characters',
+    'string.max': 'Message cant be more than 250 characters',
   }),
 });
 
-export default userSchema;
+export default contactUsSchema;
