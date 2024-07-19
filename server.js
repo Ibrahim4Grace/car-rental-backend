@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import db from './src/config/db.js';
 import { notFound, errorHandler } from './src/middlewares/errorMiddleware.js';
+import keepAlive from './src/config/cronJob.js';
 import routes from './src/routes/index.js';
 import cors from 'cors';
 import corsOptions from './src/config/corsOptions.js';
@@ -36,3 +37,6 @@ const port = process.env.PORT || 6000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`.yellow);
 });
+
+// Start keepAlive function
+keepAlive();

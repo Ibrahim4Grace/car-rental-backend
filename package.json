@@ -24,6 +24,7 @@
     "moment": "^2.30.1",
     "mongoose": "^8.4.4",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.14",
     "validator": "^13.12.0",
     "winston": "^3.13.0"
