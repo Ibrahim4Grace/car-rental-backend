@@ -8,7 +8,7 @@ import userRoute from './userRoute.js';
 import adminRoute from './adminRoute.js';
 
 // Mount the landing page route
-router.use('/', pageRoute);
+router.use('/api/v1', pageRoute);
 router.use('/auth', authRoute);
 router.use('/user', userRoute);
 router.use('/admin', adminRoute);

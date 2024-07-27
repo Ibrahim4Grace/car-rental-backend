@@ -4,7 +4,7 @@ import { pageCtrlr } from '../controllers/index.js';
 const router = express.Router();
 
 router.post('/bookings', pageCtrlr.createBooking);
-router.post('/contantUsPage', pageCtrlr.contantUsPage);
-router.post('/CreateNewsletter', pageCtrlr.CreateNewsletter);
+router.post('/contant-us-page', pageCtrlr.contantUsPage);
+router.post('/Create-newsletter', pageCtrlr.CreateNewsletter);
 
 export default router;

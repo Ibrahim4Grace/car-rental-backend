@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  res.send('Kadosh API is running');
+  res.send('Korex-auto-rentals API is running');
 });
 
 // Use routes
@@ -38,5 +38,5 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`.yellow);
 });
 
-// Start keepAlive function
+// Start cron job keepAlive function
 keepAlive();

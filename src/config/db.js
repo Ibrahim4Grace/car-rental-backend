@@ -22,7 +22,7 @@ async function connectDb() {
     logger.info(`New connection to the database: ${db.connection.host}`.gray);
     connection.isConnected = db.connections[0].readyState;
   } catch (error) {
-    logger.info(`Error: ${error.message}`);
+    logger.error(`Error: ${error.message}`);
     process.exit(1);
   }
 }

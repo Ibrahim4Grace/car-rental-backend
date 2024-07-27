@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import logger from '../../logger/logger.js';
 import customEnv from '../config/customEnv.js';
 
+// Helper function to send email and log the result
 const transporter = nodemailer.createTransport({
   service: customEnv.mailerService,
   auth: {
@@ -9,6 +10,16 @@ const transporter = nodemailer.createTransport({
     pass: customEnv.nodemailerPassword,
   },
 });
+
+const sendEmail = async (mailOptions) => {
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      logger.info('Email sending error:', error);
+    } else {
+      logger.info('Email sent:', info.response);
+    }
+  });
+};
 
 const sendContactUsEmail = async (newContactUs, message) => {
   const verifiedMsg = `
@@ -38,13 +49,7 @@ const sendContactUsEmail = async (newContactUs, message) => {
     ],
   };
 
-  transporter.sendMail(mailOptions, async (error, info) => {
-    if (error) {
-      logger.info('Email sending error:', error);
-    } else {
-      logger.info('Email sent:', info.response);
-    }
-  });
+  await sendEmail(mailOptions);
 };
 
 const newsLetterMsg = async (newNewsLetter) => {
@@ -79,13 +84,7 @@ const newsLetterMsg = async (newNewsLetter) => {
     ],
   };
 
-  transporter.sendMail(mailOptions, async (error, info) => {
-    if (error) {
-      logger.info('Email sending error:', error);
-    } else {
-      logger.info('Email sent:', info.response);
-    }
-  });
+  await sendEmail(mailOptions);
 };
 
 const sendBookingConfirmation = async (newBooking) => {
@@ -125,13 +124,7 @@ const sendBookingConfirmation = async (newBooking) => {
     ],
   };
 
-  transporter.sendMail(mailOptions, async (error, info) => {
-    if (error) {
-      logger.info('Email sending error:', error);
-    } else {
-      logger.info('Email sent:', info.response);
-    }
-  });
+  await sendEmail(mailOptions);
 };
 
 export { sendContactUsEmail, newsLetterMsg, sendBookingConfirmation };
