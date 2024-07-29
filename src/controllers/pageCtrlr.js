@@ -127,7 +127,7 @@ export const contantUsPage = asyncHandler(async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Message recieved successful',
+      message: 'Message sent successful',
     });
   } catch (error) {
     logger.error(error);

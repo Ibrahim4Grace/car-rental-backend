@@ -1,7 +1,6 @@
 // /routes/userRoutes.js
 import express from 'express';
-import { userCtrlr } from '../controllers/index.js';
-
+import * as userCtrlr from '../controllers/index.js';
 const router = express.Router();
 
 // Define routes and map them to controller methods
