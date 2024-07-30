@@ -3,17 +3,12 @@ import asyncHandler from '../middlewares/asyncHandler.js';
 import logger from '../../logger/logger.js';
 import moment from 'moment';
 import { sanitizeObject } from '../utils/index.js';
-import { ContactUs, NewsLetter, Booking } from '../models/index.js';
-import {
-  contactUsSchema,
-  newsLetterSchema,
-  bookingSchema,
-} from '../validations/index.js';
+import { ContactUs, Booking } from '../models/index.js';
+import { contactUsSchema, bookingSchema } from '../validations/index.js';
 import {
   sendContactUsEmail,
-  newsLetterMsg,
   sendBookingConfirmation,
-} from '../mailers/contactUsMailer.js';
+} from '../mailers/index.js';
 
 export const createBooking = asyncHandler(async (req, res) => {
   try {
@@ -129,40 +124,6 @@ export const contantUsPage = asyncHandler(async (req, res) => {
       success: true,
       message: 'Message sent successful',
     });
-  } catch (error) {
-    logger.error(error);
-  }
-});
-
-export const CreateNewsletter = asyncHandler(async (req, res) => {
-  try {
-    const sanitizedBody = sanitizeObject(req.body);
-    const { error, value } = newsLetterSchema.validate(sanitizedBody);
-    if (error) {
-      const errors = error.details.map((err) => ({
-        key: err.path[0],
-        msg: err.message,
-      }));
-      return res.status(400).json({ success: false, errors });
-    }
-
-    const { subscriberEmail } = value;
-    const existingNewsLetter = await NewsLetter.findOne({ subscriberEmail });
-    if (existingNewsLetter) {
-      throw new APIError('User already subscribed', 400);
-    }
-
-    const newNewsLetter = new NewsLetter({
-      subscriberEmail,
-    });
-    await newNewsLetter.save();
-
-    // Call the email sending function to send message to the sender
-    await newsLetterMsg(newNewsLetter);
-
-    res
-      .status(201)
-      .json({ success: true, message: 'Newsletter successfully Joined' });
   } catch (error) {
     logger.error(error);
   }
