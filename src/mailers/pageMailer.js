@@ -21,7 +21,7 @@ const sendEmail = async (mailOptions) => {
   });
 };
 
-const sendContactUsEmail = async (newContactUs, message) => {
+export const sendContactUsEmail = async (newContactUs, message) => {
   const verifiedMsg = `
     <p><img src="cid:companyLogo" alt="companyLogo" style="width: 100%; height: 250px;"/></p><br>
     <p>Dear  ${newContactUs.firstName} ${newContactUs.lastName}, </p>
@@ -52,7 +52,7 @@ const sendContactUsEmail = async (newContactUs, message) => {
   await sendEmail(mailOptions);
 };
 
-const sendBookingConfirmation = async (newBooking) => {
+export const sendBookingConfirmation = async (newBooking) => {
   const msg = `
   <p><img src="cid:companyLogo" alt="companyLogo" style="width: 100%; height: 250px;"/></p><br>
   <p>Dear ${newBooking.name}, Thank you for booking a ride with us.</p>
@@ -92,4 +92,24 @@ const sendBookingConfirmation = async (newBooking) => {
   await sendEmail(mailOptions);
 };
 
-export { sendContactUsEmail, sendBookingConfirmation };
+export const forgetPasswordMsg = async (user, resetLink) => {
+  const mailOptions = {
+    from: customEnv.nodemailerEmail,
+    to: user.email,
+    subject: 'Password Reset Request',
+    text: `You are receiving this email because you ${user.first_name} ${user.last_name} have requested a password reset.\n Please click on the following link to complete the process:\n\n${resetLink}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.`,
+  };
+
+  await sendEmail(mailOptions);
+};
+
+export const sendPasswordResetEmail = async (user) => {
+  const mailOptions = {
+    from: customEnv.nodemailerEmail,
+    to: user.email,
+    subject: 'Password Reset Confirmation',
+    text: `Hello ${user.first_name},\n\nYour password has been successfully reset. If you did not perform this action, please contact our support team immediately.\n\nBest regards,\nKorex auto rentals`,
+  };
+
+  await sendEmail(mailOptions);
+};
