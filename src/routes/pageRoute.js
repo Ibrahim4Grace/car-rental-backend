@@ -1,9 +1,9 @@
 import express from 'express';
 import * as pageCtrlr from '../controllers/index.js';
 
-const router = express.Router();
+const pageRoute = express.Router();
 
-router.post('/bookings', pageCtrlr.createBooking);
-router.post('/contact-us-page', pageCtrlr.contantUsPage);
+pageRoute.post('/bookings', pageCtrlr.createBooking);
+pageRoute.post('/contact-us-page', pageCtrlr.contantUsPage);
 
-export default router;
+export default pageRoute;

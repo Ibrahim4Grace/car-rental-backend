@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const customEnv = {
+export const customEnv = {
   port: process.env.PORT,
 
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -53,5 +53,3 @@ const customEnv = {
 
   cors: process.env.CORS_WHITELIST,
 };
-
-export default customEnv;

@@ -1,44 +1,36 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import validator from 'validator';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema(
   {
-    UserFullName: {
-      type: String,
-      required: [true, 'Organization name is required'],
-      trim: true,
-    },
+    first_name: { type: String, required: true, trim: true },
+    last_name: { type: String, required: true, trim: true },
+    password: { type: String, required: true, select: false },
+    gender: { type: String, enum: ['Male', 'Female'] },
+    address: { type: String, trim: true },
+    city: { type: String, trim: true },
+    state: { type: String, trim: true },
+    zipcode: { type: Number, trim: true },
+    googleId: { type: String, trim: true },
     email: {
       type: String,
-      required: [true, 'Email is required'],
-      unique: true,
+      required: true,
       lowercase: true,
       trim: true,
-      validate: [validator.isEmail, 'Please provide a valid email address'],
     },
-    password: {
+    phone_number: {
       type: String,
-      required: [true, 'Password is required'],
-      select: false, // I want to prevent password from being returned by default
-    },
-    phoneNumber: {
-      type: String,
-      required: [true, 'Phone number is required'],
+      required: true,
       validate: {
-        validator: function (v) {
-          return validator.isMobilePhone(v, 'any');
-        },
+        validator: (v) => validator.isMobilePhone(v, 'any'),
         message: 'Please provide a valid phone number',
       },
     },
-
-    googleId: { type: String },
-    isVerified: { type: Boolean, default: false },
-    verificationToken: {
-      token: { type: String, default: null },
-      expires: { type: Date, default: null },
-    },
+    isEmailVerified: { type: Boolean, default: false },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
   },
   {
     timestamps: true,
@@ -59,6 +51,22 @@ userSchema.pre('save', async function (next) {
 // Instance method to check if entered password matches the hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.getResetPasswordToken = function () {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash and set to resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set token expire time (e.g., 10 minutes)
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);

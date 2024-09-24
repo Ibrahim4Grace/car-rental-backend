@@ -1,12 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import db from './src/config/db.js';
+import { db, corsOptions } from './src/config/index.js';
 import { notFound, errorHandler } from './src/middlewares/errorMiddleware.js';
-import keepAlive from './src/config/cronJob.js';
+// import keepAlive from './src/config/cronJob.js';
 import routes from './src/routes/index.js';
 import cors from 'cors';
-import corsOptions from './src/config/corsOptions.js';
+
 import colors from 'colors';
 
 dotenv.config();
@@ -38,5 +38,5 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`.yellow);
 });
 
-// Start cron job keepAlive function
-keepAlive();
+// // Start cron job keepAlive function
+// keepAlive();

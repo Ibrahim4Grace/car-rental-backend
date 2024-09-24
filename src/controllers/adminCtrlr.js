@@ -1,7 +1,6 @@
-import { APIError } from '../middlewares/errorMiddleware.js';
-import * as userService from '../services/userService.js';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import logger from '../../logger/logger.js';
+import { APIError, asyncHandler } from '../middlewares/index.js';
+// import * as userService from '../services/userService.js';
+// import logger from '../../logger/logger.js';
 
 export const loginPage = asyncHandler(async (req, res) => {
   try {

@@ -1,6 +1,5 @@
 import validator from 'validator';
 
-// Helper function to trim and sanitize input
 const sanitizeInput = (input) => {
   if (typeof input === 'string') {
     input = validator.trim(input);

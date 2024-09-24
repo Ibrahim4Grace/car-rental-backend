@@ -1,11 +1,9 @@
-import { APIError } from '../middlewares/errorMiddleware.js';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import logger from '../../logger/logger.js';
+import { asyncHandler, APIError } from '../middlewares/index.js';
+
+// import logger from '../../logger/logger.js';
 import { sanitizeObject } from '../utils/index.js';
-import { ContactUs, NewsLetter } from '../models/index.js';
-import * as userService from '../services/userService.js';
-import {} from '../mailers/index.js';
-import {} from '../validations/index.js';
+import { ContactUs } from '../models/index.js';
+// import * as userService from '../services/userService.js';
 
 // Create a new user
 export const createUser = asyncHandler(async (req, res) => {
