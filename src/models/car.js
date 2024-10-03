@@ -4,59 +4,46 @@ const carSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Car name is required'],
+      required: true,
       trim: true,
     },
     model: {
       type: String,
-      required: [true, 'Car model is required'],
+      required: true,
       trim: true,
     },
-    manufacturer: {
+    brand: {
       type: String,
-      required: [true, 'Manufacturer is required'],
+      required: true,
       trim: true,
     },
     year: {
       type: Number,
-      required: [true, 'Manufacturing year is required'],
+      required: true,
+      trim: true,
     },
-    transmission: {
+    license_plate: {
       type: String,
-      required: [true, 'Transmission type is required'],
+      required: true,
       trim: true,
     },
     mileage: {
       type: String,
-      required: [true, 'Mileage is required'],
+      required: true,
       trim: true,
     },
-    fuel: {
-      type: String,
-      required: [true, 'Fuel type is required'],
-      trim: true,
-    },
-    seats: {
+    rent_price: {
       type: Number,
-      required: [true, 'Number of seats is required'],
-    },
-    luggage: {
-      type: String,
-      required: [true, 'Luggage capacity is required'],
+      required: true,
       trim: true,
     },
-    gps: {
-      type: Boolean,
-      required: [true, 'GPS availability is required'],
+    status: {
+      type: String,
+      enum: ['Active', 'Inactive'],
+      default: 'Active',
+      trim: true,
     },
-    bluetooth: {
-      type: Boolean,
-      required: [true, 'Bluetooth availability is required'],
-    },
-    centralLocking: {
-      type: Boolean,
-      required: [true, 'Central locking availability is required'],
-    },
+    image: { imageId: String, imageUrl: String },
   },
   {
     timestamps: true,
@@ -65,4 +52,4 @@ const carSchema = new mongoose.Schema(
 
 const Car = mongoose.model('Car', carSchema);
 
-export default Car;
+export { Car };

@@ -1,7 +1,26 @@
 import express from 'express';
 import * as adminCtrlr from '../controllers/index.js';
-const router = express.Router();
-router.post('/loginPage', adminCtrlr.loginPage); // Create a new user
-router.post('/loginPage', adminCtrlr.loginPs); // Create a new user
+import { adminImage, carsImage } from '../config/index.js';
+import { validateData } from '../middlewares/index.js';
+import { carSchema } from '../schema/index.js';
 
-export default router;
+const adminRoute = express.Router();
+
+adminRoute.post(
+  '/uploadImage',
+  // verifyUserToken,
+  // getAdminById,
+  adminImage.single('image'),
+  adminCtrlr.uploadAdminImage
+);
+
+adminRoute.post(
+  '/cars',
+  validateData(carSchema),
+  // verifyUserToken,
+  // getAdminById,
+  carsImage.single('images'),
+  adminCtrlr.addCars
+);
+
+export default adminRoute;

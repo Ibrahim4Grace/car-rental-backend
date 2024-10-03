@@ -107,3 +107,63 @@ export const userSchema = Joi.object({
     'string.min': 'Message must be at least 6 characters',
   }),
 });
+
+// export const carSchema = Joi.object({
+//   name: Joi.string().required().messages({
+//     'string.empty': 'First name is required',
+//   }),
+//   model: Joi.string().required().messages({
+//     'string.empty': 'Last name is required',
+//   }),
+//   brand: Joi.string().required().messages({
+//     'string.empty': 'Phone number is required',
+//   }),
+//   year: Joi.string().required().messages({
+//     'string.empty': 'Phone number is required',
+//   }),
+//   license_plate: Joi.string().required().messages({
+//     'string.empty': 'Phone number is required',
+//   }),
+//   mileage: Joi.string().required().messages({
+//     'string.empty': 'Phone number is required',
+//   }),
+//   fuel: Joi.string().required().messages({
+//     'string.empty': 'Phone number is required',
+//   }),
+//   seats: Joi.string().required().messages({
+//     'string.empty': 'Phone number is required',
+//   }),
+// });
+
+import { z } from 'zod';
+import validator from 'validator';
+
+const sanitizeInput = (value) => {
+  return validator.escape(validator.trim(value));
+};
+
+export const carSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').transform(sanitizeInput),
+  model: z.string().trim().min(1, 'Model is required').transform(sanitizeInput),
+  brand: z.string().trim().min(1, 'brand is required').transform(sanitizeInput),
+  year: z
+    .string()
+    .trim()
+    .min(1, 'year number is required')
+    .transform(sanitizeInput),
+  license_plate: z
+    .string()
+    .trim()
+    .min(1, 'Plate number is required')
+    .transform(sanitizeInput),
+  mileage: z
+    .string()
+    .trim()
+    .min(1, 'mileage is required')
+    .transform(sanitizeInput),
+  rent_price: z
+    .string()
+    .trim()
+    .min(1, 'rent price is required')
+    .transform(sanitizeInput),
+});

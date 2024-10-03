@@ -8,39 +8,39 @@ const bookingSchema = new mongoose.Schema(
     },
     carType: {
       type: String,
-      required: [true, 'Car type is required'],
+      required: true,
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: true,
     },
     name: {
       type: String,
-      required: [true, 'Name is required'],
+      required: true,
     },
     pickUpLocation: {
       type: String,
-      required: [true, 'Pick-up location is required'],
+      required: true,
     },
     dropOffLocation: {
       type: String,
-      required: [true, 'Drop-off location is required'],
+      required: true,
     },
     pickUpDate: {
       type: Date,
-      required: [true, 'Pick-up date is required'],
+      required: true,
     },
     pickUpTime: {
       type: String,
-      required: [true, 'Pick-up time is required'],
+      required: true,
     },
     dropOffDate: {
       type: Date,
-      required: [true, 'Drop-off date is required'],
+      required: true,
     },
     dropOffTime: {
       type: String,
-      required: [true, 'Drop-off time is required'],
+      required: true,
     },
   },
   {

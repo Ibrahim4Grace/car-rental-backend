@@ -1,72 +1,28 @@
 import { asyncHandler, APIError } from '../middlewares/index.js';
 
-// import logger from '../../logger/logger.js';
-import { sanitizeObject } from '../utils/index.js';
-import { ContactUs } from '../models/index.js';
-// import * as userService from '../services/userService.js';
+export const uploadUserImage = asyncHandler(async (req, res) => {
+  const user = req.currentUser;
 
-// Create a new user
-export const createUser = asyncHandler(async (req, res) => {
-  try {
-    const user = await userService.createUser(req.body);
-
-    res.status(201).json({ success: true, data: user });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+  const file = req.file;
+  if (!file) {
+    return res.status(400).json({
+      success: false,
+      message: 'No file uploaded.',
+    });
   }
-});
 
-// Get a user by ID
-export const getUserById = asyncHandler(async (req, res) => {
-  try {
-    const user = await userService.getUserById(req.params.id);
-    if (!user) {
-      throw new APIError('User not found', 404);
-    }
+  const cloudinaryResult = await cloudinary.uploader.upload(file.path);
 
-    res.status(200).json({ success: true, data: user });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-});
-
-// Update a user by ID
-export const updateUser = asyncHandler(async (req, res) => {
-  try {
-    const user = await userService.updateUser(req.params.id, req.body);
-    if (!user) {
-      throw new APIError('User not found', 404);
-    }
-
-    res.status(200).json({ success: true, data: user });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-});
-
-// Delete a user by ID
-export const deleteUser = asyncHandler(async (req, res) => {
-  try {
-    const user = await userService.deleteUser(req.params.id);
-    if (!user) {
-      throw new APIError('User not found', 404);
-    }
-
-    res
-      .status(200)
-      .json({ success: true, message: 'User deleted successfully' });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-});
-
-// Get all users
-export const getAllUsers = asyncHandler(async (req, res) => {
-  try {
-    const users = await userService.getAllUsers();
-
-    res.status(200).json({ success: true, data: users });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
+  const image = {
+    imageId: cloudinaryResult.public_id,
+    imageUrl: cloudinaryResult.secure_url,
+  };
+  user.image = image;
+  await user.save();
+  const callbackUrl = '/admin/index';
+  return res.status(200).json({
+    callbackUrl,
+    success: true,
+    message: 'Image uploaded successfully',
+  });
 });
