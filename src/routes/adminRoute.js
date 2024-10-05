@@ -16,10 +16,11 @@ adminRoute.post(
 
 adminRoute.post(
   '/cars',
-  validateData(carSchema),
+
   // verifyUserToken,
   // getAdminById,
-  carsImage.single('images'),
+  carsImage.single('image'),
+  validateData(carSchema),
   adminCtrlr.addCars
 );
 

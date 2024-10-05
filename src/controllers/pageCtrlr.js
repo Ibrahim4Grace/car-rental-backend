@@ -1,4 +1,4 @@
-import { APIError, asyncHandler } from '../middlewares/index.js';
+import { asyncHandler } from '../middlewares/index.js';
 import moment from 'moment';
 import { ContactUs, Booking } from '../models/index.js';
 import { contactUsSchema, bookingSchema } from '../schema/index.js';

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import validator from 'validator';
 import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema(
@@ -23,10 +22,6 @@ const userSchema = new mongoose.Schema(
     phone_number: {
       type: String,
       required: true,
-      validate: {
-        validator: (v) => validator.isMobilePhone(v, 'any'),
-        message: 'Please provide a valid phone number',
-      },
     },
     isEmailVerified: { type: Boolean, default: false },
     resetPasswordToken: { type: String, default: null },

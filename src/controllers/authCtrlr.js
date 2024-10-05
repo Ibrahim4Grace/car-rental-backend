@@ -1,7 +1,13 @@
 import crypto from 'crypto';
-import { asyncHandler, APIError } from '../middlewares/index.js';
-import { authSchema } from '../schema/index.js';
+// import { authSchema } from '../schema/index.js';
 import { User, OTP } from '../models/index.js';
+import {
+  asyncHandler,
+  Conflict,
+  ResourceNotFound,
+  BadRequest,
+} from '../middlewares/index.js';
+
 import {
   sanitizeObject,
   sanitizeInput,
@@ -16,25 +22,25 @@ import {
 } from '../utils/index.js';
 
 export const registerPage = asyncHandler(async (req, res) => {
-  const sanitizedBody = sanitizeObject(req.body);
-  const { error, value } = authSchema.validate(sanitizedBody, {
-    abortEarly: false,
-  });
+  // const sanitizedBody = sanitizeObject(req.body);
+  // const { error, value } = authSchema.validate(sanitizedBody, {
+  //   abortEarly: false,
+  // });
 
-  if (error) {
-    const errors = error.details.map((err) => ({
-      key: err.path[0],
-      msg: err.message,
-    }));
-    return res.status(400).json({ success: false, errors });
-  }
+  // if (error) {
+  //   const errors = error.details.map((err) => ({
+  //     key: err.path[0],
+  //     msg: err.message,
+  //   }));
+  //   return res.status(400).json({ success: false, errors });
+  // }
 
   const { first_name, last_name, email, password, phone_number, gender } =
-    value;
+    req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new APIError('Email already registered!', 409);
+    throw new Conflict('Email already registered!', 409);
   }
 
   const newUser = new User({
@@ -61,12 +67,12 @@ export const verifyOtp = asyncHandler(async (req, res) => {
   const { email, otp } = sanitizeInput(req.body);
   const user = await User.findOne({ email });
   if (!user) {
-    throw new APIError('User not found!', 404);
+    throw new ResourceNotFound('User not found!');
   }
 
   const isOTPValid = await verifyOTP(user._id, otp);
   if (!isOTPValid) {
-    throw new APIError('Invalid or expired OTP', 400);
+    throw new BadRequest('Invalid or expired OTP');
   }
 
   user.isEmailVerified = true;
@@ -78,7 +84,7 @@ export const forgetPassword = asyncHandler(async (req, res) => {
   const { email } = sanitizeInput(req.body);
   const user = await User.findOne({ email });
   if (!user) {
-    throw new APIError('Email not found', 404);
+    throw new ResourceNotFound('Email not found');
   }
 
   const resetToken = user.getResetPasswordToken();
@@ -103,10 +109,10 @@ export const forgetPassword = asyncHandler(async (req, res) => {
 export const resetPassword = asyncHandler(async (req, res) => {
   const { token, newPassword } = sanitizeInput(req.body);
   if (!newPassword) {
-    throw new APIError('Password is required', 400);
+    throw new BadRequest('Password is required');
   }
   if (newPassword.length < 6) {
-    throw new APIError('Password must be at least 6 characters', 400);
+    throw new BadRequest('Password must be at least 6 characters');
   }
 
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
@@ -117,7 +123,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new APIError('Invalid or expired token', 400);
+    throw new BadRequest('Invalid or expired token');
   }
 
   user.password = newPassword;

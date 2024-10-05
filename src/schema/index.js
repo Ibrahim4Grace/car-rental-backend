@@ -1,9 +1,15 @@
 import {
   contactUsSchema,
   bookingSchema,
-  authSchema,
+  registerSchema,
   userSchema,
   carSchema,
 } from './validation.js';
 
-export { contactUsSchema, bookingSchema, authSchema, userSchema, carSchema };
+export {
+  contactUsSchema,
+  bookingSchema,
+  registerSchema,
+  userSchema,
+  carSchema,
+};

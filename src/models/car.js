@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const carSchema = new mongoose.Schema(
   {
-    name: {
+    brand: {
       type: String,
       required: true,
       trim: true,
@@ -12,13 +12,19 @@ const carSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    brand: {
-      type: String,
+    year: {
+      type: Number,
       required: true,
       trim: true,
     },
-    year: {
-      type: Number,
+    status: {
+      type: String,
+      enum: ['Active', 'Inactive'],
+      default: 'Active',
+      trim: true,
+    },
+    state: {
+      type: String,
       required: true,
       trim: true,
     },
@@ -32,17 +38,12 @@ const carSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    rent_price: {
+    price: {
       type: Number,
       required: true,
       trim: true,
     },
-    status: {
-      type: String,
-      enum: ['Active', 'Inactive'],
-      default: 'Active',
-      trim: true,
-    },
+
     image: { imageId: String, imageUrl: String },
   },
   {

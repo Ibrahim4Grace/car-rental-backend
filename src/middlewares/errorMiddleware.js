@@ -1,12 +1,3 @@
-class APIError extends Error {
-  constructor(message, statusCode) {
-    super(message);
-    this.statusCode = statusCode || 500;
-    this.success = false;
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-
 const notFound = (req, res, next) => {
   const error = new APIError(`Not Found - ${req.originalUrl}`, 404);
   next(error);
@@ -28,4 +19,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-export { notFound, errorHandler, APIError };
+export { notFound, errorHandler };

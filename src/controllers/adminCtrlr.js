@@ -1,8 +1,11 @@
-// import { carSchema } from '../schema/index.js';
 import { Car } from '../models/index.js';
 import { cloudinary } from '../config/index.js';
-import { sanitizeObject, sendMail, log } from '../utils/index.js';
-import { APIError, asyncHandler, Conflict } from '../middlewares/index.js';
+import { sendMail, log } from '../utils/index.js';
+import {
+  asyncHandler,
+  Conflict,
+  ResourceNotFound,
+} from '../middlewares/index.js';
 
 export const uploadAdminImage = asyncHandler(async (req, res) => {
   const user = req.currentUser;
@@ -32,62 +35,40 @@ export const uploadAdminImage = asyncHandler(async (req, res) => {
 });
 
 export const addCars = asyncHandler(async (req, res) => {
-  // const sanitizedBody = sanitizeObject(req.body);
-  // const { error, value } = carSchema.validate(sanitizedBody, {
-  //   abortEarly: false,
-  // });
+  const { model, brand, year, license_plate, mileage, price, state } = req.body;
 
-  // if (error) {
-  //   const errors = error.details.map((err) => ({
-  //     key: err.path[0],
-  //     msg: err.message,
-  //   }));
-  //   return res.status(400).json({ success: false, errors });
-  // }
-
-  const { name, model, brand, year, license_plate, mileage, rent_price } =
-    req.body;
-  const exisitingCar = await Car.findOne({
-    $or: [{ rent_price: rent_price }, { license_plate: license_plate }],
+  const existingCar = await Car.findOne({
+    license_plate: license_plate,
   });
-
-  if (exisitingCar) {
-    if (exisitingCar.rent_price === rent_price) {
-      throw new Conflict('Price already exists');
-    }
-    if (exisitingCar.license_plate === license_plate) {
-      throw new Conflict('Plate number already registered', 409);
+  if (existingCar) {
+    if (existingCar.license_plate === license_plate) {
+      throw new Conflict('Car with the plate number already registered');
     }
   }
 
   const file = req.file;
   if (!file) {
-    return res.status(400).json({
-      success: false,
-      message: 'No file uploaded.',
-    });
+    throw new ResourceNotFound('No file uploaded');
   }
 
   const cloudinaryResult = await cloudinary.uploader.upload(file.path);
-
   const image = {
     imageId: cloudinaryResult.public_id,
     imageUrl: cloudinaryResult.secure_url,
   };
 
   const newCar = new Car({
-    name,
     model,
     brand,
     year,
     license_plate,
     mileage,
-    rent_price,
+    price,
+    state,
     image,
   });
 
   await newCar.save();
-  const redirectUrl = `/admin/car-list`;
   res.status(200).json({
     redirectUrl,
     success: true,

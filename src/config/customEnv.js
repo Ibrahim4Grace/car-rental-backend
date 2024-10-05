@@ -24,11 +24,6 @@ export const customEnv = {
   userAccessTokenExpireTime: process.env.USER_ACCESS_TOKEN_EXPIRATION_TIME,
   userRefreshTokenExpireTime: process.env.USER_REFRESH_TOKEN_EXPIRATION_TIME,
 
-  adminAccessToken: process.env.ADMIN_ACCESS_TOKEN,
-  adminRefreshToken: process.env.ADMIN_REFRESH_TOKEN,
-  adminAccessTokenExpireTime: process.env.ADMIN_ACCESS_TOKEN_EXPIRATION_TIME,
-  adminRefreshTokenExpireTime: process.env.ADMIN_REFRESH_TOKEN_EXPIRATION_TIME,
-
   mailerService: process.env.MAILER_SERVICE,
   nodemailerEmail: process.env.NODEMAILER_EMAIL,
   nodemailerPassword: process.env.NODEMAILER_PASSWORD,

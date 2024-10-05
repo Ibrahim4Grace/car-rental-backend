@@ -1,4 +1,4 @@
-import { asyncHandler, APIError } from '../middlewares/index.js';
+import { asyncHandler } from '../middlewares/index.js';
 
 export const uploadUserImage = asyncHandler(async (req, res) => {
   const user = req.currentUser;
