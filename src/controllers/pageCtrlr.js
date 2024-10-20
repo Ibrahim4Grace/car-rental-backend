@@ -1,28 +1,12 @@
-import { asyncHandler } from '../middlewares/index.js';
-import moment from 'moment';
+import { asyncHandler, Conflict } from '../middlewares/index.js';
 import { ContactUs, Booking } from '../models/index.js';
-import { contactUsSchema, bookingSchema } from '../schema/index.js';
 import {
-  sanitizeObject,
-  log,
   sendMail,
-  sendContactUsEmail,
-  sendBookingConfirmation,
+  contactUsConfirmation,
+  bookingConfirmation,
 } from '../utils/index.js';
 
 export const createBooking = asyncHandler(async (req, res) => {
-  const sanitizedBody = sanitizeObject(req.body);
-  const { error, value } = bookingSchema.validate(sanitizedBody, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    const errors = error.details.map((err) => ({
-      key: err.path[0],
-      msg: err.message,
-    }));
-    return res.status(400).json({ success: false, errors });
-  }
   const {
     carType,
     email,
@@ -33,21 +17,19 @@ export const createBooking = asyncHandler(async (req, res) => {
     pickUpTime,
     dropOffDate,
     dropOffTime,
-  } = value;
+  } = req.body;
 
-  const parsedPickUpDate = moment(
-    `${pickUpDate} ${pickUpTime}`,
-    'YYYY-MM-DD HH:mm A',
-    true
-  );
-  const parsedDropOffDate = moment(
-    `${dropOffDate} ${dropOffTime}`,
-    'YYYY-MM-DD HH:mm A',
-    true
-  );
-
-  if (!parsedPickUpDate.isValid() || !parsedDropOffDate.isValid()) {
-    return res.status(400).json({ message: 'Invalid date or time format' });
+  const existingBooking = await Booking.findOne({
+    carType: carType,
+    pickUpLocation: pickUpLocation,
+    dropOffLocation: dropOffLocation,
+    pickUpDate: pickUpDate,
+    pickUpTime: pickUpTime,
+    dropOffDate: dropOffDate,
+    dropOffTime: dropOffTime,
+  });
+  if (existingBooking) {
+    throw new Conflict('Booking already exists');
   }
 
   const newBooking = new Booking({
@@ -56,34 +38,21 @@ export const createBooking = asyncHandler(async (req, res) => {
     name,
     pickUpLocation,
     dropOffLocation,
-    pickUpDate: parsedPickUpDate.toDate(),
-    pickUpTime: parsedPickUpDate.format('HH:mm'),
-    dropOffDate: parsedDropOffDate.toDate(),
-    dropOffTime: parsedDropOffDate.format('HH:mm'),
+    pickUpDate,
+    pickUpTime,
+    dropOffDate,
+    dropOffTime,
   });
-
   await newBooking.save();
-  const emailContent = sendBookingConfirmation(newBooking);
+
+  const emailContent = await bookingConfirmation(newBooking);
   await sendMail(emailContent);
 
   res.status(201).json({ message: 'Booking created successfully', newBooking });
 });
 
 export const contantUsPage = asyncHandler(async (req, res) => {
-  const sanitizedBody = sanitizeObject(req.body);
-  const { error, value } = contactUsSchema.validate(sanitizedBody, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    const errors = error.details.map((err) => ({
-      key: err.path[0],
-      msg: err.message,
-    }));
-    return res.status(400).json({ success: false, errors });
-  }
-
-  const { firstName, lastName, phone, email, subject, message } = value;
+  const { firstName, lastName, phone, email, subject, message } = req.body;
 
   const newContactUs = new ContactUs({
     firstName,
@@ -94,7 +63,8 @@ export const contantUsPage = asyncHandler(async (req, res) => {
     message,
   });
   await newContactUs.save();
-  const emailContent = sendContactUsEmail(newContactUs, message);
+
+  const emailContent = contactUsConfirmation(newContactUs, message);
   await sendMail(emailContent);
 
   res.status(201).json({

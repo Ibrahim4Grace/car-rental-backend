@@ -4,8 +4,10 @@ import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema(
   {
-    first_name: { type: String, required: true, trim: true },
-    last_name: { type: String, required: true, trim: true },
+    firstName: { type: String, required: true, trim: true },
+    lastName: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true },
+    phone: { type: String, required: true },
     password: { type: String, required: true, select: false },
     gender: { type: String, enum: ['Male', 'Female'] },
     address: { type: String, trim: true },
@@ -13,16 +15,7 @@ const userSchema = new mongoose.Schema(
     state: { type: String, trim: true },
     zipcode: { type: Number, trim: true },
     googleId: { type: String, trim: true },
-    email: {
-      type: String,
-      required: true,
-      lowercase: true,
-      trim: true,
-    },
-    phone_number: {
-      type: String,
-      required: true,
-    },
+
     isEmailVerified: { type: Boolean, default: false },
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },

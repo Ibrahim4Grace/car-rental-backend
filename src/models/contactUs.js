@@ -5,38 +5,32 @@ const contactUsSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: [true, 'First name is required'],
+      required: true,
       trim: true,
     },
     lastName: {
       type: String,
-      required: [true, 'Last name is required'],
+      required: true,
       trim: true,
     },
     phone: {
       type: String,
-      required: [true, 'Phone number is required'],
-      validate: {
-        validator: function (v) {
-          return validator.isMobilePhone(v, 'any');
-        },
-        message: 'Please provide a valid phone number',
-      },
+      required: true,
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: true,
       lowercase: true,
       trim: true,
     },
     subject: {
       type: String,
-      required: [true, 'Subject is required'],
+      required: true,
       trim: true,
     },
     message: {
       type: String,
-      required: [true, 'Message is required'],
+      required: true,
       trim: true,
     },
   },

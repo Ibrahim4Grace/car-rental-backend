@@ -1,5 +1,3 @@
-import Joi from 'joi';
-
 import { z, ZodDate } from 'zod';
 import validator from 'validator';
 
@@ -7,128 +5,204 @@ const sanitizeInput = (value) => {
   return validator.trim(validator.escape(value));
 };
 
-export const contactUsSchema = Joi.object({
-  firstName: Joi.string().required().messages({
-    'string.empty': 'First name is required',
-  }),
-  lastName: Joi.string().required().messages({
-    'string.empty': 'Last name is required',
-  }),
-  phone: Joi.string().required().messages({
-    'string.empty': 'Phone number is required',
-  }),
-  email: Joi.string().email().required().messages({
-    'string.empty': 'Email is required',
-    'string.email': 'Email must be valid',
-  }),
-  subject: Joi.string().required().messages({
-    'string.empty': 'Subject is required',
-  }),
-  message: Joi.string().min(6).max(250).required().messages({
-    'string.empty': 'Message is required',
-    'string.min': 'Message must be at least 6 characters',
-    'string.max': 'Message cant be more than 250 characters',
-  }),
-});
-
-export const bookingSchema = Joi.object({
-  carType: Joi.string().required().messages({
-    'string.empty': 'Car type is required',
-  }),
-  email: Joi.string().email().required().messages({
-    'string.empty': 'Email is required',
-    'string.email': 'Email must be valid',
-  }),
-  name: Joi.string().required().messages({
-    'string.empty': 'Name type is required',
-  }),
-  pickUpLocation: Joi.string().required().messages({
-    'string.empty': 'Pick up location is required',
-  }),
-  dropOffLocation: Joi.string().required().messages({
-    'string.empty': 'Drop off location is required',
-  }),
-  pickUpDate: Joi.string().required().messages({
-    'string.empty': 'pick up date is required',
-  }),
-  pickUpTime: Joi.string().required().messages({
-    'string.empty': 'pick up time is required',
-  }),
-  dropOffDate: Joi.string().required().messages({
-    'string.empty': 'Drop off date is required',
-  }),
-  dropOffTime: Joi.string().required().messages({
-    'string.empty': 'Drop off time is required',
-  }),
-});
-
-export const registerSchema = z.object({
-  first_name: z
+export const bookingSchema = z.object({
+  carType: z
     .string()
     .trim()
-    .min(1, { message: 'First name is required' })
-    .transform(sanitizeInput),
-
-  last_name: z
-    .string()
-    .trim()
-    .min(1, { message: 'Last name is required' })
+    .min(1, 'Car type is required')
     .transform(sanitizeInput),
 
   email: z
     .string()
     .trim()
-    .min(1, { message: 'Email is required' })
-    .email({ message: 'Invalid email address' })
+    .min(1, 'Email is required')
+    .email('Invalid email address')
     .transform(sanitizeInput),
 
-  password: z
-    .string()
+  name: z.string().trim().min(1, 'Name is required').transform(sanitizeInput),
 
-    .min(5, { message: 'Password must be at least 5 characters' }),
-
-  confirm_password: z
-    .string()
-
-    .min(5, { message: 'Confirm password must be at least 5 characters' })
-    .refine((value, ctx) => value === ctx.parent.password, {
-      message: 'Passwords must match',
-    }),
-
-  phone_number: z
+  pickUpLocation: z
     .string()
     .trim()
-    .min(6, { message: 'Phone number must be at least 6 characters' })
+    .min(1, 'Pick up location is required')
     .transform(sanitizeInput),
 
-  gender: z
+  dropOffLocation: z
     .string()
     .trim()
-    .min(1, { message: 'Gender is required' })
+    .min(1, 'Drop off location is required')
+    .transform(sanitizeInput),
+
+  pickUpDate: z.preprocess((arg) => {
+    if (typeof arg === 'string' || arg instanceof Date) return new Date(arg);
+  }, z.date().min(new Date(), 'Pick up date must be in the future')),
+
+  pickUpTime: z
+    .string()
+    .trim()
+    .min(1, 'Pick up time is required')
+    .transform(sanitizeInput),
+
+  dropOffDate: z.preprocess((arg) => {
+    if (typeof arg === 'string' || arg instanceof Date) return new Date(arg);
+  }, z.date().min(new Date(), 'Drop off date must be in the future')),
+
+  dropOffTime: z
+    .string()
+    .trim()
+    .min(1, 'Drop off time is required')
+    .transform(sanitizeInput),
+
+  // pickUpDate: ZodDate.parse({ required_error: 'Pick up date is required' }).transform(sanitizeInput),
+
+  // pickUpTime: ZodDate.parse({ required_error: 'Pick up time is required' }).transform(sanitizeInput),
+
+  // dropOffDate: ZodDate.parse({ required_error: 'Drop off date is required' }).transform(sanitizeInput),
+
+  // dropOffTime: ZodDate.parse({ required_error: 'Drop off time is required' }).transform(sanitizeInput),
+});
+
+export const contactUsSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(1, 'First name is required')
+    .transform(sanitizeInput),
+
+  lastName: z
+    .string()
+    .trim()
+    .min(1, 'Last name is required')
+    .transform(sanitizeInput),
+
+  phone: z
+    .string()
+    .trim()
+    .min(6, 'Phone number must be at least 6 characters')
+    .transform(sanitizeInput),
+
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Email is required')
+    .email('Invalid email address')
+    .transform(sanitizeInput),
+
+  subject: z
+    .string()
+    .trim()
+    .min(1, 'Subject is required')
+    .transform(sanitizeInput),
+
+  message: z
+    .string()
+    .trim()
+    .min(1, 'Message is required')
+    .max(250)
     .transform(sanitizeInput),
 });
 
-export const userSchema = Joi.object({
-  firstName: Joi.string().required().messages({
-    'string.empty': 'First name is required',
-  }),
-  lastName: Joi.string().required().messages({
-    'string.empty': 'Last name is required',
-  }),
-  phone: Joi.string().required().messages({
-    'string.empty': 'Phone number is required',
-  }),
-  email: Joi.string().email().required().messages({
-    'string.empty': 'Email is required',
-    'string.email': 'Email must be valid',
-  }),
-  phone: Joi.string().required().messages({
-    'string.empty': 'Phone number is required',
-  }),
-  message: Joi.string().min(6).required().messages({
-    'string.empty': 'Message is required',
-    'string.min': 'Message must be at least 6 characters',
-  }),
+export const registerSchema = z
+  .object({
+    firstName: z
+      .string()
+      .trim()
+      .min(1, 'First name is required')
+      .transform(sanitizeInput),
+
+    lastName: z
+      .string()
+      .trim()
+      .min(1, 'Last name is required')
+      .transform(sanitizeInput),
+
+    email: z
+      .string()
+      .trim()
+      .min(1, 'Email is required')
+      .email('Invalid email address')
+      .transform(sanitizeInput),
+
+    password: z.string().min(5, 'Password must be at least 5 characters'),
+
+    confirm_password: z
+      .string()
+      .min(5, 'Confirm password must be at least 5 characters'),
+
+    phone: z
+      .string()
+      .trim()
+      .min(6, 'Phone number must be at least 6 characters')
+      .transform(sanitizeInput),
+
+    gender: z
+      .string()
+      .trim()
+      .min(1, 'Gender is required')
+      .transform(sanitizeInput),
+  })
+  .superRefine(({ password, confirm_password }, ctx) => {
+    if (password !== confirm_password) {
+      ctx.addIssue({
+        path: ['confirm_password'],
+        message: 'Passwords must match',
+      });
+    }
+  });
+
+export const verifySchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Email is required')
+    .email('Invalid email address')
+    .transform(sanitizeInput),
+  otp: z.string().trim().min(1, 'otp is required').transform(sanitizeInput),
+});
+
+export const forgetPswdSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Email is required')
+    .email('Invalid email address')
+    .transform(sanitizeInput),
+});
+
+export const resetPswdSchema = z.object({
+  token: z.string().trim().min(1, 'Token is required').transform(sanitizeInput),
+  newPassword: z
+    .string()
+    .trim()
+    .min(1, 'New password is required')
+    .transform(sanitizeInput),
+});
+
+export const userSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(1, 'First name is required')
+    .transform(sanitizeInput),
+
+  lastName: z
+    .string()
+    .trim()
+    .min(1, 'Last name is required')
+    .transform(sanitizeInput),
+
+  phone: z
+    .string()
+    .trim()
+    .min(6, 'Phone number must be at least 6 characters')
+    .transform(sanitizeInput),
+
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Email is required')
+    .email('Invalid email address')
+    .transform(sanitizeInput),
 });
 
 export const carSchema = z.object({

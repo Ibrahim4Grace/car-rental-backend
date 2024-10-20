@@ -13,7 +13,8 @@ function validateData(schema, targets = ['body']) {
     } catch (error) {
       if (error instanceof ZodError) {
         const errorMessages = error.errors.map((issue) => ({
-          message: `${issue.path.join('.')} is ${issue.message}`,
+          path: issue.path,
+          message: issue.message,
         }));
         res.status(422).json({ errors: errorMessages });
       } else {

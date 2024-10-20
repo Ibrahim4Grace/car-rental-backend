@@ -1,6 +1,5 @@
 import crypto from 'crypto';
-// import { authSchema } from '../schema/index.js';
-import { User, OTP } from '../models/index.js';
+import { User } from '../models/index.js';
 import {
   asyncHandler,
   Conflict,
@@ -9,62 +8,44 @@ import {
 } from '../middlewares/index.js';
 
 import {
-  sanitizeObject,
-  sanitizeInput,
   sendMail,
   generateOTP,
   saveOTPToDatabase,
   sendOTPByEmail,
   verifyOTP,
-  log,
   forgetPasswordMsg,
   sendPasswordResetEmail,
 } from '../utils/index.js';
 
 export const registerPage = asyncHandler(async (req, res) => {
-  // const sanitizedBody = sanitizeObject(req.body);
-  // const { error, value } = authSchema.validate(sanitizedBody, {
-  //   abortEarly: false,
-  // });
-
-  // if (error) {
-  //   const errors = error.details.map((err) => ({
-  //     key: err.path[0],
-  //     msg: err.message,
-  //   }));
-  //   return res.status(400).json({ success: false, errors });
-  // }
-
-  const { first_name, last_name, email, password, phone_number, gender } =
-    req.body;
+  const { firstName, lastName, email, password, phone, gender } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new Conflict('Email already registered!', 409);
+    throw new Conflict('Email already registered!');
   }
 
   const newUser = new User({
-    first_name,
-    last_name,
+    firstName,
+    lastName,
     email,
     password,
-    phone_number,
+    phone,
     gender,
   });
   await newUser.save();
 
   const { otp, hashedOTP } = await generateOTP();
   await saveOTPToDatabase(newUser._id, otp, hashedOTP);
-  const emailContent = sendOTPByEmail(newUser, otp);
+  const emailContent = await sendOTPByEmail(newUser, otp);
   await sendMail(emailContent);
-
   res
     .status(201)
     .json({ message: 'Registration successful. Please verify your email.' });
 });
 
 export const verifyOtp = asyncHandler(async (req, res) => {
-  const { email, otp } = sanitizeInput(req.body);
+  const { email, otp } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
     throw new ResourceNotFound('User not found!');
@@ -81,7 +62,8 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 });
 
 export const forgetPassword = asyncHandler(async (req, res) => {
-  const { email } = sanitizeInput(req.body);
+  const { email } = req.body;
+
   const user = await User.findOne({ email });
   if (!user) {
     throw new ResourceNotFound('Email not found');
@@ -107,7 +89,7 @@ export const forgetPassword = asyncHandler(async (req, res) => {
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
-  const { token, newPassword } = sanitizeInput(req.body);
+  const { token, newPassword } = req.body;
   if (!newPassword) {
     throw new BadRequest('Password is required');
   }

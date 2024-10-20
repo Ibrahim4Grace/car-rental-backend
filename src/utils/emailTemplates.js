@@ -1,19 +1,6 @@
 import { customEnv } from '../config/index.js';
 
-export const sendContactUsEmail = (newContactUs, message) => ({
-  from: customEnv.nodemailerEmail,
-  to: newContactUs.email,
-  subject: 'Welcome to Korex auto rentals!',
-  html: `
-        <p>Dear  ${newContactUs.firstName} ${newContactUs.lastName}, </p>
-        <p>Thank you for reaching out to us. We have received your message and will get back to you as soon as possible.</p>
-        <p>Here is a copy of your message:</p>
-        <blockquote>${newContactUs.message}</blockquote>
-        <p>Best regards,<br>
-      The Korex Autos Rentals Team</p>`,
-});
-
-export const sendBookingConfirmation = async (newBooking) => ({
+export const bookingConfirmation = async (newBooking) => ({
   from: customEnv.nodemailerEmail,
   to: newBooking.email,
   subject: 'Booking Confirmation!',
@@ -37,6 +24,31 @@ export const sendBookingConfirmation = async (newBooking) => ({
 
   <p>Warm regards,<br>
   Korex autos rentals</p>`,
+});
+
+export const contactUsConfirmation = (newContactUs, message) => ({
+  from: customEnv.nodemailerEmail,
+  to: newContactUs.email,
+  subject: 'Welcome to Korex auto rentals!',
+  html: `
+        <p>Dear  ${newContactUs.firstName} ${newContactUs.lastName}, </p>
+        <p>Thank you for reaching out to us. We have received your message and will get back to you as soon as possible.</p>
+        <p>Here is a copy of your message:</p>
+        <blockquote>${newContactUs.message}</blockquote>
+        <p>Best regards,<br>
+      The Korex Autos Rentals Team</p>`,
+});
+
+export const sendOTPByEmail = async (newUser, otp, otpExpiryHours = 24) => ({
+  from: customEnv.nodemailerEmail,
+  to: newUser.email,
+  subject: 'Your 6-digit Verification Code',
+  html: `  <p>Dear ${newUser.firstName}, </p>
+      <p>Use the 6-digit Code provided below to verify your email:</p>
+      <p>Your verification code is: <b>${otp}</b></p>
+      <p>This code will expire in ${otpExpiryHours} hours.</p>
+      <p>If you didn't register, please ignore this email.</p>
+      <p>Best regards</p>`,
 });
 
 export const forgetPasswordMsg = (user, resetLink) => ({
@@ -63,16 +75,4 @@ export const sendPasswordResetEmail = (user) => ({
             
             <p>Best regards,<br>
           The Korex Autos Rentals Team</p>`,
-});
-
-export const sendOTPByEmail = async (newUser, otp, otpExpiryHours = 24) => ({
-  from: customEnv.nodemailerEmail,
-  to: newUser.email,
-  subject: 'Your 6-digit Verification Code',
-  html: `  <p>Dear User, </p>
-      <p>Use the 6-digit Code provided below to verify your email:</p>
-      <p>Your verification code is: <b>${otp}</b></p>
-      <p>This code will expire in ${otpExpiryHours} hours.</p>
-      <p>If you didn't register, please ignore this email.</p>
-      <p>Best regards</p>`,
 });
