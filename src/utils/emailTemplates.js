@@ -56,7 +56,7 @@ export const forgetPasswordMsg = (user, resetLink) => ({
   to: user.email,
   subject: 'Password Reset Request',
   html: `
-          <p>You are receiving this email because you ${user.first_name} ${user.last_name} have requested a password reset.</p>
+          <p>You are receiving this email because you ${user.firstName} ${user.lastName} have requested a password reset.</p>
           
           <p>Please click on the following link to complete the process:\n\n${resetLink}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.</p>
        

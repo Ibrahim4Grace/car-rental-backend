@@ -1,5 +1,6 @@
 import crypto from 'crypto';
-import { User } from '../models/index.js';
+import bcrypt from 'bcryptjs';
+import { User, OTP } from '../models/index.js';
 import {
   asyncHandler,
   Conflict,
@@ -12,7 +13,6 @@ import {
   generateOTP,
   saveOTPToDatabase,
   sendOTPByEmail,
-  verifyOTP,
   forgetPasswordMsg,
   sendPasswordResetEmail,
 } from '../utils/index.js';
@@ -39,26 +39,38 @@ export const registerPage = asyncHandler(async (req, res) => {
   await saveOTPToDatabase(newUser._id, otp, hashedOTP);
   const emailContent = await sendOTPByEmail(newUser, otp);
   await sendMail(emailContent);
+
   res
     .status(201)
     .json({ message: 'Registration successful. Please verify your email.' });
 });
 
 export const verifyOtp = asyncHandler(async (req, res) => {
-  const { email, otp } = req.body;
-  const user = await User.findOne({ email });
+  const { otp } = req.body;
+
+  const existingOtp = await OTP.findOne({ otp: { $exists: true } });
+  if (!existingOtp) {
+    throw new BadRequest('Invalid or expired OTP');
+  }
+
+  const userId = existingOtp.userOrAdmin;
+  const user = await User.findById(userId);
   if (!user) {
     throw new ResourceNotFound('User not found!');
   }
 
-  const isOTPValid = await verifyOTP(user._id, otp);
-  if (!isOTPValid) {
+  const isOTPValid = await bcrypt.compare(otp, existingOtp.otp);
+  if (!isOTPValid || new Date() > existingOtp.expiresAt) {
     throw new BadRequest('Invalid or expired OTP');
   }
 
   user.isEmailVerified = true;
   await user.save();
-  res.status(200).json({ success: true, message: 'Verification successful.' });
+  await OTP.deleteOne({ _id: existingOtp._id });
+
+  res
+    .status(200)
+    .json({ success: true, message: 'Verification successful login.' });
 });
 
 export const forgetPassword = asyncHandler(async (req, res) => {
@@ -72,7 +84,6 @@ export const forgetPassword = asyncHandler(async (req, res) => {
   const resetToken = user.getResetPasswordToken();
   await user.save();
 
-  // Create reset link
   const frontendURL =
     process.env.NODE_ENV === 'production'
       ? process.env.FE_URL_PROD
@@ -84,18 +95,12 @@ export const forgetPassword = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: 'Reset link sent to your mail successfully',
+    message: 'Reset link sent to your mail.',
   });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
   const { token, newPassword } = req.body;
-  if (!newPassword) {
-    throw new BadRequest('Password is required');
-  }
-  if (newPassword.length < 6) {
-    throw new BadRequest('Password must be at least 6 characters');
-  }
 
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
@@ -111,7 +116,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.password = newPassword;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
-
   await user.save();
 
   const emailContent = sendPasswordResetEmail(user);

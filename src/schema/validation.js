@@ -151,12 +151,6 @@ export const registerSchema = z
   });
 
 export const verifySchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, 'Email is required')
-    .email('Invalid email address')
-    .transform(sanitizeInput),
   otp: z.string().trim().min(1, 'otp is required').transform(sanitizeInput),
 });
 
@@ -174,7 +168,7 @@ export const resetPswdSchema = z.object({
   newPassword: z
     .string()
     .trim()
-    .min(1, 'New password is required')
+    .min(6, 'New password is required')
     .transform(sanitizeInput),
 });
 

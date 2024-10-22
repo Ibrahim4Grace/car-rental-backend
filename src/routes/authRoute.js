@@ -15,12 +15,15 @@ authRoute.post(
   validateData(registerSchema),
   authCtrlr.registerPage
 );
+
 authRoute.post('/verify-otp', validateData(verifySchema), authCtrlr.verifyOtp);
+
 authRoute.post(
   '/forget-password',
   validateData(forgetPswdSchema),
   authCtrlr.forgetPassword
 );
+
 authRoute.post(
   '/reset-password',
   validateData(resetPswdSchema),

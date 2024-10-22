@@ -11,8 +11,6 @@ export const customEnv = {
 
   sessionSecret: process.env.SESSION_SECRET,
 
-  jwtSerectResetPassword: process.env.JWT_SECRET_RESET_PASSWORD,
-
   maxFailedAttempt: process.env.MAX_FAILED_ATTEMPTS,
 
   payStackSecret: process.env.PAYSTACK_SECRET,
@@ -28,9 +26,6 @@ export const customEnv = {
   nodemailerEmail: process.env.NODEMAILER_EMAIL,
   nodemailerPassword: process.env.NODEMAILER_PASSWORD,
 
-  companyEmail: process.env.COMPANY_EMAIL,
-  companyNumber: process.env.COMPANY_NUMBER,
-
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
   googleOauthRedirectUrl: process.env.GOOGLE_0AUTH_REDIRECTURL,
@@ -40,11 +35,6 @@ export const customEnv = {
   cloudinarySecretName: process.env.CLOUDINARY_SECRET_NAME,
 
   paystackSecret: process.env.PAYSTACK_SECRET,
-
-  officeAddress: process.env.OFFICE_ADDRESS,
-  officeCity: process.env.OFFICE_CITY,
-  officeState: process.env.OFFICE_STATE,
-  officeCountry: process.env.OFFICE_COUNTRY,
 
   cors: process.env.CORS_WHITELIST,
 };
