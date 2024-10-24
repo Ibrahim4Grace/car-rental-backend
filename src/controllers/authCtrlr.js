@@ -1,11 +1,14 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { User, OTP } from '../models/index.js';
+import { customEnv } from '../config/index.js';
+import jwt from 'jsonwebtoken';
 import {
   asyncHandler,
   Conflict,
   ResourceNotFound,
   BadRequest,
+  Forbidden,
 } from '../middlewares/index.js';
 
 import {
@@ -15,6 +18,7 @@ import {
   sendOTPByEmail,
   forgetPasswordMsg,
   sendPasswordResetEmail,
+  LoginNotification,
 } from '../utils/index.js';
 
 export const registerPage = asyncHandler(async (req, res) => {
@@ -100,15 +104,14 @@ export const forgetPassword = asyncHandler(async (req, res) => {
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
-  const { token, newPassword } = req.body;
+  const { newPassword, confirm_newPassword } = req.body;
+  const { token } = req.params;
 
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
   const user = await User.findOne({
     resetPasswordToken: hashedToken,
     resetPasswordExpires: { $gt: Date.now() },
   });
-
   if (!user) {
     throw new BadRequest('Invalid or expired token');
   }
@@ -120,9 +123,64 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   const emailContent = sendPasswordResetEmail(user);
   await sendMail(emailContent);
-
   res.status(200).json({
     success: true,
     message: 'Password reset successfully',
   });
+});
+
+export const loginPage = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const existingUser = await User.findOne({ email }).select('+password');
+
+  if (!existingUser) {
+    throw new ResourceNotFound('Invalid email or password');
+  }
+
+  if (!existingUser.isEmailVerified) {
+    throw new Forbidden('Please verify your email before logging in.');
+  }
+
+  if (existingUser.status !== 'completed') {
+    throw new Forbidden('Please complete your registration before logging in.');
+  }
+
+  const isPasswordMatch = await account.matchPassword(password);
+  if (!isPasswordMatch) {
+    throw new Unauthorized('Invalid email or password');
+  }
+
+  const { accessToken, refreshToken } = generateTokensAndSetCookies(
+    res,
+    existingUser._id
+  );
+
+  res.status(200).json({
+    success: true,
+    message: 'login successful',
+    accessToken,
+    refreshToken,
+  });
+});
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies.refreshToken;
+  if (!refreshToken) {
+    throw new Unauthorized('No refresh token provided');
+  }
+
+  const decoded = jwt.verify(refreshToken, customEnv.jwtRefreshTokenSecret);
+
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    throw new Unauthorized('User not found');
+  }
+
+  const { accessToken } = generateTokensAndSetCookies(user._id);
+
+  return res.status(200).json({ accessToken });
+});
+
+export const logOutPage = asyncHandler(async (req, res) => {
+  res.cookie('jwt', '', { maxAge: 1 });
 });

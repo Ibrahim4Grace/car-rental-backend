@@ -163,13 +163,37 @@ export const forgetPswdSchema = z.object({
     .transform(sanitizeInput),
 });
 
-export const resetPswdSchema = z.object({
-  token: z.string().trim().min(1, 'Token is required').transform(sanitizeInput),
-  newPassword: z
+export const resetPswdSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .trim()
+      .min(6, 'New password is required')
+      .transform(sanitizeInput),
+
+    confirm_newPassword: z
+      .string()
+      .min(6, 'Confirm password is required')
+      .transform(sanitizeInput),
+  })
+  .superRefine(({ newPassword, confirm_newPassword }, ctx) => {
+    if (newPassword !== confirm_newPassword) {
+      ctx.addIssue({
+        path: ['confirm_newPassword'],
+        message: 'Passwords must match',
+      });
+    }
+  });
+
+export const loginSchema = z.object({
+  email: z
     .string()
     .trim()
-    .min(6, 'New password is required')
+    .min(1, 'Email is required')
+    .email('Invalid email address')
     .transform(sanitizeInput),
+
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 export const userSchema = z.object({

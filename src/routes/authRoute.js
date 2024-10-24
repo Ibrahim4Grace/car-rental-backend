@@ -6,6 +6,7 @@ import {
   verifySchema,
   forgetPswdSchema,
   resetPswdSchema,
+  loginSchema,
 } from '../schema/index.js';
 
 const authRoute = express.Router();
@@ -25,9 +26,15 @@ authRoute.post(
 );
 
 authRoute.post(
-  '/reset-password',
+  '/reset-password/:token',
   validateData(resetPswdSchema),
   authCtrlr.resetPassword
 );
+
+authRoute.post('/login', validateData(loginSchema), authCtrlr.loginPage);
+
+authRoute.post('/refresh-token', authCtrlr.refreshAccessToken);
+
+authRoute.delete('/logout', authCtrlr.logOutPage);
 
 export default authRoute;

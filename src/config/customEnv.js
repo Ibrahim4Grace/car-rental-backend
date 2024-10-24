@@ -17,10 +17,11 @@ export const customEnv = {
 
   jwtSecret: process.env.JWT_SECRET,
 
-  userAccessToken: process.env.USER_ACCESS_TOKEN,
-  userRefreshToken: process.env.USER_REFRESH_TOKEN,
-  userAccessTokenExpireTime: process.env.USER_ACCESS_TOKEN_EXPIRATION_TIME,
-  userRefreshTokenExpireTime: process.env.USER_REFRESH_TOKEN_EXPIRATION_TIME,
+  accessToken: process.env.ACCESS_TOKEN,
+  refreshToken: process.env.REFRESH_TOKEN,
+  jwtRefreshTokenSecret: process.env.JWT_REFRESH_TOKEN_SECRET,
+  accessTokenExpireTime: process.env.ACCESS_TOKEN_EXPIRATION_TIME,
+  refreshTokenExpireTime: process.env.REFRESH_TOKEN_EXPIRATION_TIME,
 
   mailerService: process.env.MAILER_SERVICE,
   nodemailerEmail: process.env.NODEMAILER_EMAIL,

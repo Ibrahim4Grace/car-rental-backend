@@ -69,9 +69,24 @@ export const sendPasswordResetEmail = (user) => ({
   to: user.email,
   subject: 'Password Reset Confirmation',
   html: `
-            <p>Hello ${user.first_name},</p>
+            <p>Hello ${user.firstName},</p>
             
             <p>Your password has been successfully reset. If you did not perform this action, please contact our support team immediately.</p>
+            
+            <p>Best regards,<br>
+          The Korex Autos Rentals Team</p>`,
+});
+
+export const LoginNotification = (user) => ({
+  from: customEnv.nodemailerEmail,
+  to: user.email,
+  subject: 'Password Reset Confirmation',
+  html: `
+            <p>Hello ${user.firstName},</p>
+            
+            <p>We identified unusual activity in a recent sign in attempt from your KAR account. If you initiated the request to sign into KAR, kindly ignore the mail.</p>
+
+            <p>If you did not initiate the request to sign in to korex auto account, we strongly advise you to change your account password. Additionally, we encourage you to enable multi-factor authentication to add an additional layer of protection to your KAR account.</p>
             
             <p>Best regards,<br>
           The Korex Autos Rentals Team</p>`,

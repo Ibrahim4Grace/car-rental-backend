@@ -1,3 +1,5 @@
+import { ResourceNotFound } from '../middlewares/index.js';
+
 const notFound = (req, res, next) => {
   const error = new ResourceNotFound(`Not Found - ${req.originalUrl}`, 404);
   next(error);
