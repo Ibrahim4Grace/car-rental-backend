@@ -15,7 +15,13 @@ const userSchema = new mongoose.Schema(
     state: { type: String, trim: true },
     zipcode: { type: Number, trim: true },
     googleId: { type: String, trim: true },
-
+    role: {
+      type: String,
+      trim: true,
+      enum: ['User', 'Admin', 'Super_Admin'],
+      default: 'User',
+    },
+    image: { imageId: String, imageUrl: String },
     isEmailVerified: { type: Boolean, default: false },
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },

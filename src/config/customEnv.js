@@ -7,19 +7,21 @@ export const customEnv = {
 
   nodeEnv: process.env.NODE_ENV || 'development',
 
+  paystackSecret: process.env.PAYSTACK_SECRET,
+
+  cors: process.env.CORS_WHITELIST,
+
   mongoDbURI: process.env.MONGODB_URI,
 
   sessionSecret: process.env.SESSION_SECRET,
 
-  maxFailedAttempt: process.env.MAX_FAILED_ATTEMPTS,
-
-  payStackSecret: process.env.PAYSTACK_SECRET,
-
   jwtSecret: process.env.JWT_SECRET,
 
   accessToken: process.env.ACCESS_TOKEN,
+  accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
   refreshToken: process.env.REFRESH_TOKEN,
-  jwtRefreshTokenSecret: process.env.JWT_REFRESH_TOKEN_SECRET,
+  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
+
   accessTokenExpireTime: process.env.ACCESS_TOKEN_EXPIRATION_TIME,
   refreshTokenExpireTime: process.env.REFRESH_TOKEN_EXPIRATION_TIME,
 
@@ -35,7 +37,6 @@ export const customEnv = {
   cloudinaryApiName: process.env.CLOUDINARY_API_NAME,
   cloudinarySecretName: process.env.CLOUDINARY_SECRET_NAME,
 
-  paystackSecret: process.env.PAYSTACK_SECRET,
-
-  cors: process.env.CORS_WHITELIST,
+  companyEmail: process.env.COMPANY_EMAIL,
+  companyNumber: process.env.COMPANY_NUMBER,
 };

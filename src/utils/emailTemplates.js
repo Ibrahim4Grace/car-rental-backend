@@ -51,6 +51,18 @@ export const sendOTPByEmail = async (newUser, otp, otpExpiryHours = 24) => ({
       <p>Best regards</p>`,
 });
 
+export const welcomeEmail = (user) => ({
+  from: customEnv.nodemailerEmail,
+  to: user.email,
+  subject: 'Welcome to Korex Auto ',
+  html: `<p>Hello ${user.firstName},</p>
+
+      <p>Your account has been successfully created, granting you access to our platform's exciting features.</p>
+      <p>Should you have any inquiries or require assistance, please don't hesitate to contact our support team at <a href="tel:${customEnv.companyNumber}">${customEnv.companyNumber}</a> or <a href="mailto:${customEnv.companyEmail}">${customEnv.companyEmail}</a>.Your satisfaction is our priority, and we are committed to providing you with the assistance you need.</p>
+        <p>Best regards,<br>
+          The Korex Autos Rentals Team</p>`,
+});
+
 export const forgetPasswordMsg = (user, resetLink) => ({
   from: customEnv.nodemailerEmail,
   to: user.email,
@@ -77,10 +89,10 @@ export const sendPasswordResetEmail = (user) => ({
           The Korex Autos Rentals Team</p>`,
 });
 
-export const LoginNotification = (user) => ({
+export const loginNotification = (user) => ({
   from: customEnv.nodemailerEmail,
   to: user.email,
-  subject: 'Password Reset Confirmation',
+  subject: 'New Login Detected!',
   html: `
             <p>Hello ${user.firstName},</p>
             

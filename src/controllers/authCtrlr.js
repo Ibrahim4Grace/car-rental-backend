@@ -1,14 +1,15 @@
-import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { User, OTP } from '../models/index.js';
 import { customEnv } from '../config/index.js';
 import jwt from 'jsonwebtoken';
+import { userPasswordService, adminPasswordService } from '../service/index.js';
 import {
   asyncHandler,
   Conflict,
   ResourceNotFound,
   BadRequest,
   Forbidden,
+  Unauthorized,
 } from '../middlewares/index.js';
 
 import {
@@ -16,9 +17,9 @@ import {
   generateOTP,
   saveOTPToDatabase,
   sendOTPByEmail,
-  forgetPasswordMsg,
-  sendPasswordResetEmail,
-  LoginNotification,
+  loginNotification,
+  generateTokensAndSetCookies,
+  welcomeEmail,
 } from '../utils/index.js';
 
 export const registerPage = asyncHandler(async (req, res) => {
@@ -72,87 +73,63 @@ export const verifyOtp = asyncHandler(async (req, res) => {
   await user.save();
   await OTP.deleteOne({ _id: existingOtp._id });
 
+  const emailContent = welcomeEmail(user);
+  await sendMail(emailContent);
+
   res
     .status(200)
     .json({ success: true, message: 'Verification successful login.' });
 });
 
-export const forgetPassword = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new ResourceNotFound('Email not found');
-  }
-
-  const resetToken = user.getResetPasswordToken();
-  await user.save();
-
-  const frontendURL =
-    process.env.NODE_ENV === 'production'
-      ? process.env.FE_URL_PROD
-      : process.env.FE_URL_DEV;
-  const resetLink = `${frontendURL}/auth/reset-password/${resetToken}`;
-
-  const emailContent = forgetPasswordMsg(user, resetLink);
-  await sendMail(emailContent);
-
-  res.status(200).json({
-    success: true,
-    message: 'Reset link sent to your mail.',
-  });
+export const adminForgotPassword = asyncHandler(async (req, res) => {
+  const message = await adminPasswordService.handleForgotPassword(
+    req.body.email
+  );
+  sendJsonResponse(res, 200, message);
 });
 
-export const resetPassword = asyncHandler(async (req, res) => {
-  const { newPassword, confirm_newPassword } = req.body;
-  const { token } = req.params;
-
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-  const user = await User.findOne({
-    resetPasswordToken: hashedToken,
-    resetPasswordExpires: { $gt: Date.now() },
-  });
-  if (!user) {
-    throw new BadRequest('Invalid or expired token');
-  }
-
-  user.password = newPassword;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpires = undefined;
-  await user.save();
-
-  const emailContent = sendPasswordResetEmail(user);
-  await sendMail(emailContent);
-  res.status(200).json({
-    success: true,
-    message: 'Password reset successfully',
-  });
+export const adminVerifyPasswordOtp = asyncHandler(async (req, res) => {
+  const resetToken = await adminPasswordService.handleVerifyOTP(req.body.otp);
+  sendJsonResponse(
+    res,
+    200,
+    'OTP verified successfully. You can now reset your password.',
+    { resetToken }
+  );
 });
 
-export const loginPage = asyncHandler(async (req, res) => {
+export const adminResetPassword = asyncHandler(async (req, res) => {
+  const resetToken = req.headers.authorization?.split(' ')[1];
+  const message = await adminPasswordService.handleResetPassword(
+    resetToken,
+    req.body.newPassword
+  );
+  sendJsonResponse(res, 200, message);
+});
+
+export const adminLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const existingUser = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email }).select('+password');
 
-  if (!existingUser) {
+  if (!user) {
     throw new ResourceNotFound('Invalid email or password');
   }
 
-  if (!existingUser.isEmailVerified) {
-    throw new Forbidden('Please verify your email before logging in.');
+  if (!user.isEmailVerified) {
+    throw new Forbidden('Verify your email before sign in.');
   }
 
-  if (existingUser.status !== 'completed') {
-    throw new Forbidden('Please complete your registration before logging in.');
-  }
-
-  const isPasswordMatch = await account.matchPassword(password);
+  const isPasswordMatch = await user.matchPassword(password);
   if (!isPasswordMatch) {
     throw new Unauthorized('Invalid email or password');
   }
 
+  const emailContent = loginNotification(user);
+  await sendMail(emailContent);
+
   const { accessToken, refreshToken } = generateTokensAndSetCookies(
     res,
-    existingUser._id
+    user._id
   );
 
   res.status(200).json({
@@ -163,13 +140,77 @@ export const loginPage = asyncHandler(async (req, res) => {
   });
 });
 
+export const userLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    throw new ResourceNotFound('Invalid email or password');
+  }
+
+  if (!user.isEmailVerified) {
+    throw new Forbidden('Verify your email before sign in.');
+  }
+
+  const isPasswordMatch = await user.matchPassword(password);
+  if (!isPasswordMatch) {
+    throw new Unauthorized('Invalid email or passwordd');
+  }
+
+  const userId = user._id.toString();
+  const { accessToken, refreshToken } = generateTokensAndSetCookies(
+    res,
+    userId
+  );
+
+  const userResponse = user.toObject();
+  delete userResponse.password;
+
+  sendJsonResponse(
+    res,
+    200,
+    'Login successful',
+    {
+      user: userResponse,
+    },
+    accessToken,
+    refreshToken
+  );
+});
+
+export const userForgotPassword = asyncHandler(async (req, res) => {
+  const message = await userPasswordService.handleForgotPassword(
+    req.body.email
+  );
+  sendJsonResponse(res, 200, message);
+});
+
+export const userVerifyPasswordOtp = asyncHandler(async (req, res) => {
+  const resetToken = await userPasswordService.handleVerifyOTP(req.body.otp);
+  sendJsonResponse(
+    res,
+    200,
+    'OTP verified successfully. You can now reset your password.',
+    { resetToken }
+  );
+});
+
+export const userResetPassword = asyncHandler(async (req, res) => {
+  const resetToken = req.headers.authorization?.split(' ')[1];
+  const message = await userPasswordService.handleResetPassword(
+    resetToken,
+    req.body.new_password
+  );
+  sendJsonResponse(res, 200, message);
+});
+
 export const refreshAccessToken = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.cookies.refreshToken;
+  const { refreshToken } = req.cookies;
   if (!refreshToken) {
     throw new Unauthorized('No refresh token provided');
   }
 
-  const decoded = jwt.verify(refreshToken, customEnv.jwtRefreshTokenSecret);
+  const decoded = jwt.verify(refreshToken, customEnv.refreshTokenSecret);
 
   const user = await User.findById(decoded.id);
   if (!user) {
@@ -182,5 +223,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 export const logOutPage = asyncHandler(async (req, res) => {
-  res.cookie('jwt', '', { maxAge: 1 });
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+  res.status(200).json({ success: true, message: 'Logged out successfully' });
 });

@@ -248,3 +248,27 @@ export const carSchema = z.object({
     .refine((value) => !isNaN(Number(value)), 'Price must be a valid number')
     .transform((value) => Number(value, sanitizeInput)),
 });
+
+export const newPasswordSchema = z
+  .object({
+    new_password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters long')
+      .transform(sanitizeInput),
+    confirm_password: z
+      .string()
+      .min(8, 'Confirm password is required')
+      .regex(
+        passwordRegex,
+        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character'
+      )
+      .transform(sanitizeInput),
+  })
+  .superRefine(({ new_password, confirm_password }, ctx) => {
+    if (new_password !== confirm_password) {
+      ctx.addIssue({
+        path: ['confirm_password'],
+        message: 'Passwords must match',
+      });
+    }
+  });

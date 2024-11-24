@@ -7,6 +7,7 @@ import {
   forgetPswdSchema,
   resetPswdSchema,
   loginSchema,
+  newPasswordSchema,
 } from '../schema/index.js';
 
 const authRoute = express.Router();
@@ -20,20 +21,43 @@ authRoute.post(
 authRoute.post('/verify-otp', validateData(verifySchema), authCtrlr.verifyOtp);
 
 authRoute.post(
-  '/forget-password',
+  '/admin/password/forgot',
   validateData(forgetPswdSchema),
-  authCtrlr.forgetPassword
+  authCtrlr.adminForgotPassword
 );
 
 authRoute.post(
-  '/reset-password/:token',
-  validateData(resetPswdSchema),
-  authCtrlr.resetPassword
+  '/admin/password/verify-otp',
+  validateData(verifySchema),
+  authCtrlr.adminVerifyPasswordOtp
 );
 
-authRoute.post('/login', validateData(loginSchema), authCtrlr.loginPage);
+authRoute.post(
+  '/admin/password/reset',
+  validateData(newPasswordSchema),
+  authCtrlr.adminResetPassword
+);
 
-authRoute.post('/refresh-token', authCtrlr.refreshAccessToken);
+authRoute.post('/admin/login', validateData(loginSchema), authCtrlr.adminLogin);
+authRoute.post('/user/login', validateData(loginSchema), authCtrlr.userLogin);
+authRoute.post(
+  '/user/password/forgot',
+  validateData(forgetPswdSchema),
+  authCtrlr.userForgotPassword
+);
+
+authRoute.post(
+  '/user/password/verify-otp',
+  validateData(verifySchema),
+  authCtrlr.userVerifyPasswordOtp
+);
+
+authRoute.post(
+  '/user/password/reset',
+  validateData(newPasswordSchema),
+  authCtrlr.userResetPassword
+);
+authRoute.post('/token/refresh', authCtrlr.refreshAccessToken);
 
 authRoute.delete('/logout', authCtrlr.logOutPage);
 
