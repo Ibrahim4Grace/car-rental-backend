@@ -18,6 +18,7 @@ class App {
         this.initializeDatabaseConnection();
         this.initializeMiddlewares();
         this.initializeControllers(controllers);
+        this.initializeDefaultRoute();
         this.initializeErrorHandling();
     }
 
@@ -33,6 +34,16 @@ class App {
     private initializeControllers(controllers: Controller[]): void {
         controllers.forEach((controller: Controller) => {
             this.express.use("/api/v1", controller.router);
+        });
+    }
+
+    private initializeDefaultRoute(): void {
+        this.express.get("/", (req, res) => {
+            res.status(200).json({
+                success: true,
+                message:
+                    "Welcome to resturant API. Use /api/v1 for all API routes.",
+            });
         });
     }
 

@@ -3,12 +3,7 @@ import User from "@/resources/user/user-interface";
 import { ContactFormType } from "@/utils/types/index";
 import bcrypt from "bcrypt";
 
-export enum UserRole {
-    ADMIN = "admin",
-    USER = "user",
-}
-
-const userSchema = new Schema(
+const userSchema = new Schema<User>(
     {
         name: {
             type: String,
@@ -27,7 +22,6 @@ const userSchema = new Schema(
         role: {
             type: String,
             trim: true,
-            enum: ["User", "Admin"],
             default: "User",
         },
         image: { imageId: String, imageUrl: String },
